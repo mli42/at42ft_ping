@@ -4,7 +4,14 @@ SERVER_SCRIPT = <<-SHELL
   echo "wireshark-common wireshark-common/install-setuid boolean true" | sudo debconf-set-selections
 
   sudo apt-get update -y
-  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 lightdm wireshark
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    xfce4 \
+    lightdm \
+    wireshark \
+    make gcc vim \
+    inetutils-ping
+
+  echo "cd /vagrant" >> /home/vagrant/.bashrc
   SHELL
 
 Vagrant.configure("2") do |config|
