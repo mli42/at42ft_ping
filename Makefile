@@ -6,7 +6,7 @@ CFLAGS := -Wall -Wextra -Werror -MMD
 SRCS_PATH := src
 OBJS_PATH := .obj
 
-SRCS_FILES := main.c
+SRCS_FILES := main.c parse_args.c
 
 SRCS := ${addprefix ${SRCS_PATH}/, ${SRCS_FILES}}
 OBJS := ${addprefix ${OBJS_PATH}/, ${SRCS_FILES:.c=.o}}
