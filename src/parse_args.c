@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "parse_args.h"
 
 typedef struct option t_getopt_option;
 
