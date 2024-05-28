@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "parse_args.h"
 
 typedef struct option t_getopt_option;
@@ -22,7 +23,16 @@ int panic(const char* const prog_name, const char* const detail) {
   return EXIT_FAILURE;
 }
 
-int parse_args(int argc, char *argv[]) {
+int parse_ttl(const char* const ttl_str, unsigned long int* const ttl) {
+  char *endptr;
+
+  *ttl = strtoul(ttl_str, &endptr, 10);
+  if (*endptr != '\0' || errno != 0)
+    return EXIT_FAILURE;
+  return EXIT_SUCCESS;
+}
+
+int parse_args(int argc, char *argv[], t_flags *flags) {
   int opt;
   int option_index = 0;
   const t_getopt_option long_options[] = {
@@ -35,14 +45,13 @@ int parse_args(int argc, char *argv[]) {
   while ((opt = getopt_long(argc, argv, "v?", long_options, &option_index)) != -1) {
     switch (opt) {
     case 0:
-      printf("option %s", long_options[option_index].name);
-      if (optarg)
-        printf(" with arg %s", optarg);
-      printf("\n");
+      if (strcmp(long_options[option_index].name, "ttl") == 0)
+        if (parse_ttl(optarg, &flags->ttl) == EXIT_FAILURE)
+          return panic(argv[0], "Invalid TTL value");
       break;
 
     case 'v':
-      printf("option -v\n");
+      flags->verbose = 1;
       break;
 
     case '?':
@@ -50,8 +59,9 @@ int parse_args(int argc, char *argv[]) {
         strcmp(argv[optind - 1], "-?") == 0 ||
         strcmp(argv[optind - 1], "--help") == 0
         ) {
+        flags->help = 1;
         print_usage(argv[0]);
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
       }
       __attribute__((fallthrough));
 
@@ -60,14 +70,14 @@ int parse_args(int argc, char *argv[]) {
     }
   }
 
-  if (optind == argc) {
-    return panic(argv[0], "Missing address or hostname after options");
+  if (optind + 1 != argc) {
+    return panic(
+      argv[0],
+      optind == argc ?
+      "Missing address or hostname after options" :
+      "Too many arguments were provided"
+    );
   }
-  else if (optind + 1 < argc) {
-    return panic(argv[0], "Too many arguments were provided");
-  }
-
-  // const char *host = argv[optind];
 
   return EXIT_SUCCESS;
 }
