@@ -12,7 +12,6 @@ SERVER_SCRIPT = <<-SHELL
   sudo usermod -aG wireshark vagrant
 
   echo "cd /vagrant" >> /home/vagrant/.bashrc
-  reboot
   SHELL
 
 Vagrant.configure("2") do |config|
