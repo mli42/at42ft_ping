@@ -9,14 +9,13 @@
 
 ### Virtual Machine
 
-To start the Virtual Machine, run:
 ```sh
+# Start the Virtual Machine
 make vm.up
+# Connect through SSH
+make vm.ssh
+# Open wireshark with X11 forwarding
+wireshark
 ```
 
-If it's the first boot, let the Window Manager reboot with:
-```sh
-make vm.reboot
-```
-
-You can log in as `vagrant:vagrant` and run `wireshark`
+You can log in as `vagrant:vagrant`
