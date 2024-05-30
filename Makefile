@@ -1,7 +1,7 @@
 NAME := ft_ping
 
 CC := gcc
-CFLAGS := -Wall -Wextra -Werror -MMD
+CFLAGS := -Wall -Wextra -MMD
 
 SRCS_PATH := src
 OBJS_PATH := .obj
