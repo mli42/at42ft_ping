@@ -67,8 +67,7 @@ unsigned short checksum(void* b, int len)
 void intHandler(int dummy) { pingloop = 0; }
 
 // Performs a DNS lookup
-char* dns_lookup(char* addr_host,
-  struct sockaddr_in* addr_con)
+char* dns_lookup(char* addr_host, struct sockaddr_in* addr_con)
 {
   printf("\nResolving DNS..\n ");
   struct hostent* host_entity;
@@ -84,10 +83,10 @@ char* dns_lookup(char* addr_host,
   strcpy(ip,
     inet_ntoa(*(struct in_addr*)host_entity->h_addr));
 
-  (*addr_con).sin_family = host_entity ->
+  addr_con->sin_family = host_entity ->
     h_addrtype;
-  (*addr_con).sin_port = htons(PORT_NO);
-  (*addr_con).sin_addr.s_addr = *(long*)host_entity->h_addr;
+  addr_con->sin_port = htons(PORT_NO);
+  addr_con->sin_addr.s_addr = *(long*)host_entity->h_addr;
 
   return ip;
 }
@@ -122,6 +121,7 @@ void send_ping(int ping_sockfd,
   int ttl_val = 64, msg_count = 0, i, addr_len, flag = 1,
     msg_received_count = 0;
 
+  signal(SIGINT, intHandler); // catching interrupt
   // receive buffer
   // ip header is included when receiving
   // from raw socket
@@ -251,14 +251,11 @@ int main(int argc, char* argv[])
   // socket()
   sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
   if (sockfd < 0) {
-    printf(
-      "\nSocket file descriptor not received !!\n");
+    printf("\nSocket file descriptor not received !!\n");
     return 0;
   }
   else
     printf("\nSocket file descriptor %d received\n", sockfd);
-
-  signal(SIGINT, intHandler); // catching interrupt
 
   // send pings continuously
   send_ping(sockfd, &addr_con, reverse_hostname, ip_addr, argv[1]);
