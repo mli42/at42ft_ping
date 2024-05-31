@@ -6,7 +6,7 @@
 # include <sys/types.h>
 
 typedef struct s_ping {
-  int             sfd;
+  int             sock_fd;
   struct sockaddr sock_addr;
   t_flags         flags;
 } t_ping;
