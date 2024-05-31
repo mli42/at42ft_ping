@@ -24,7 +24,7 @@ int hostname_to_socket(const char *const hostname, t_ping *ping) {
   freeaddrinfo(res);
 
   if ((ping->sfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) == -1) {
-    fprintf(stderr, "Couldn't create raw socket\n");
+    fprintf(stderr, "Couldn't create raw socket, do you have root privileges?\n");
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
