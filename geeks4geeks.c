@@ -1,10 +1,5 @@
 // C program to Implement Ping
 
-// ???
-#define NI_MAXHOST 0
-#define NI_NAMEREQD 0
-#define CLOCK_MONOTONIC 0
-
 // compile as -o ping
 // run as sudo ./ping <hostname>
 
@@ -31,7 +26,7 @@
 #define PORT_NO 0
 
 // Automatic port number
-#define PING_SLEEP_RATE 1000000 x
+#define PING_SLEEP_RATE 1000000
 
 // Gives the timeout delay for receiving packets
 // in seconds
@@ -118,7 +113,8 @@ void send_ping(int ping_sockfd,
   char* ping_dom, char* ping_ip,
   char* rev_host)
 {
-  int ttl_val = 64, msg_count = 0, i, addr_len, flag = 1,
+  unsigned int addr_len;
+  int ttl_val = 64, msg_count = 0, i, flag = 1,
     msg_received_count = 0;
 
   signal(SIGINT, intHandler); // catching interrupt
@@ -187,9 +183,7 @@ void send_ping(int ping_sockfd,
     // receive packet
     addr_len = sizeof(r_addr);
 
-    if (recvfrom(ping_sockfd,
-      rbuffer, sizeof(rbuffer), 0,
-      (struct sockaddr*)&r_addr, &addr_len) <= 0 & &msg_count > 1) {
+    if (recvfrom(ping_sockfd, rbuffer, sizeof(rbuffer), 0, (struct sockaddr*)&r_addr, &addr_len) <= 0 && msg_count > 1) {
       printf("\nPacket receive failed !\n");
     }
 
