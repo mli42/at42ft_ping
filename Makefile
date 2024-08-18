@@ -1,12 +1,12 @@
 NAME := ft_ping
 
 CC := gcc
-CFLAGS := -Wall -Wextra -Werror -MMD
+CFLAGS := -Wall -Wextra -MMD
 
 SRCS_PATH := src
 OBJS_PATH := .obj
 
-SRCS_FILES := main.c parse_args.c
+SRCS_FILES := main.c parse_args.c socket.c
 
 SRCS := ${addprefix ${SRCS_PATH}/, ${SRCS_FILES}}
 OBJS := ${addprefix ${OBJS_PATH}/, ${SRCS_FILES:.c=.o}}
