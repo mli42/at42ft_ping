@@ -1,0 +1,26 @@
+$ ping 8.8.8.8
+
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: icmp_seq=0 ttl=248 time=51.376 ms
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=248 time=95.633 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=248 time=134.887 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=248 time=132.498 ms
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=248 time=52.925 ms
+^C
+--- 8.8.8.8 ping statistics ---
+6 packets transmitted, 5 packets received, 16.7% packet loss
+round-trip min/avg/max/stddev = 51.376/93.464/134.887/36.494 ms
+
+======
+
+ping google.fr
+PING google.fr (172.217.20.195): 56 data bytes
+64 bytes from 172.217.20.195: icmp_seq=0 ttl=115 time=204.091 ms
+64 bytes from 172.217.20.195: icmp_seq=1 ttl=115 time=113.108 ms
+64 bytes from 172.217.20.195: icmp_seq=2 ttl=115 time=80.122 ms
+64 bytes from 172.217.20.195: icmp_seq=3 ttl=115 time=95.922 ms
+64 bytes from 172.217.20.195: icmp_seq=4 ttl=115 time=75.483 ms
+^C
+--- google.fr ping statistics ---
+5 packets transmitted, 5 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 75.483/113.745/204.091/47.064 ms
