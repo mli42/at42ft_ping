@@ -16,5 +16,6 @@ int main(int argc, char **argv) {
     return ping.flags.help ? EXIT_SUCCESS : EXIT_FAILURE;
 
   hostname_to_socket(argv[argc - 1], &ping);
+  ft_ping(&ping);
   return EXIT_SUCCESS;
 }

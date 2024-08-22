@@ -11,4 +11,6 @@ typedef struct s_ping {
   t_flags         flags;
 } t_ping;
 
+void ft_ping(t_ping *ping);
+
 #endif
