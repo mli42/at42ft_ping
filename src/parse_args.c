@@ -27,7 +27,7 @@ int parse_ttl(const char* const ttl_str, unsigned long int* const ttl) {
   char *endptr;
 
   *ttl = strtoul(ttl_str, &endptr, 10);
-  if (*endptr != '\0' || errno != 0)
+  if (*endptr != '\0' || errno != 0 || *ttl > 255)
     return EXIT_FAILURE;
   return EXIT_SUCCESS;
 }
