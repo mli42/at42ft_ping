@@ -19,3 +19,7 @@ wireshark
 ```
 
 You can log in as `vagrant:vagrant`
+
+## Sources
+
+- [How to: Calculate ICMP Packet checksum](https://www.ietf.org/rfc/rfc1071.txt) (page 6)
