@@ -16,11 +16,10 @@ int main(int argc, char **argv) {
     return ping.flags.help ? 2 : EXIT_FAILURE;
 
   if (
-    !hostname_to_socket(argv[argc - 1], &ping) ||
+    !dns_lookup(argv[argc - 1], &ping) ||
     !create_raw_socket(&ping)
     )
     return EXIT_FAILURE;
-
 
   ft_ping(&ping);
   return EXIT_SUCCESS;

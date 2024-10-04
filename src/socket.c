@@ -6,21 +6,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int hostname_to_socket(const char *const hostname, t_ping *ping) {
+int dns_lookup(const char *const hostname, t_ping *ping) {
   int status;
   struct addrinfo hints;
   struct addrinfo *res = NULL;
 
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_INET;
-  hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
+  hints.ai_flags = AI_ADDRCONFIG;
+  hints.ai_socktype = SOCK_RAW;
+  hints.ai_protocol = IPPROTO_ICMP;
 
   if ((status = getaddrinfo(hostname, NULL, &hints, &res)) != 0 || !res) {
     fprintf(stderr, "ft_ping: %s: %s\n", hostname, gai_strerror(status));
     return 0;
   }
 
-  memcpy(&ping->sock_addr, res->ai_addr, res->ai_addrlen);
+  memcpy(&ping->sockaddr, res->ai_addr, sizeof(ping->sockaddr));
   freeaddrinfo(res);
   return 1;
 }
