@@ -16,7 +16,7 @@ int hostname_to_socket(const char *const hostname, t_ping *ping) {
   hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 
   if ((status = getaddrinfo(hostname, NULL, &hints, &res)) != 0 || !res) {
-    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+    fprintf(stderr, "ft_ping: %s: %s\n", hostname, gai_strerror(status));
     return 0;
   }
 
@@ -27,7 +27,7 @@ int hostname_to_socket(const char *const hostname, t_ping *ping) {
 
 int create_raw_socket(t_ping *ping) {
   if ((ping->sock_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) == -1) {
-    fprintf(stderr, "Couldn't create raw socket, do you have root privileges?\n");
+    fprintf(stderr, "ft_ping: Couldn't create raw socket, do you have root privileges?\n");
     return 0;
   }
   return 1;
