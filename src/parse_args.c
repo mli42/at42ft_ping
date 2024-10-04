@@ -20,7 +20,7 @@ int panic(const char* const prog_name, const char* const detail) {
     fprintf(stderr, "%s: %s\n", prog_name, detail);
   fprintf(stderr, "Try '%1$s -?' or '%1$s --help' for more information.\n", prog_name);
 
-  return EXIT_FAILURE;
+  return 0;
 }
 
 int parse_ttl(const char* const ttl_str, unsigned long int* const ttl) {
@@ -28,8 +28,8 @@ int parse_ttl(const char* const ttl_str, unsigned long int* const ttl) {
 
   *ttl = strtoul(ttl_str, &endptr, 10);
   if (*endptr != '\0' || errno != 0 || *ttl > 255)
-    return EXIT_FAILURE;
-  return EXIT_SUCCESS;
+    return 0;
+  return 1;
 }
 
 int parse_args(int argc, char *argv[], t_flags *flags) {
@@ -46,7 +46,7 @@ int parse_args(int argc, char *argv[], t_flags *flags) {
     switch (opt) {
     case 0:
       if (strcmp(long_options[option_index].name, "ttl") == 0)
-        if (parse_ttl(optarg, &flags->ttl) == EXIT_FAILURE)
+        if (!parse_ttl(optarg, &flags->ttl))
           return panic(argv[0], "Invalid TTL value");
       break;
 
@@ -61,7 +61,7 @@ int parse_args(int argc, char *argv[], t_flags *flags) {
         ) {
         flags->help = 1;
         print_usage(argv[0]);
-        return EXIT_FAILURE;
+        return 0;
       }
       __attribute__((fallthrough));
 
@@ -79,5 +79,5 @@ int parse_args(int argc, char *argv[], t_flags *flags) {
     );
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }

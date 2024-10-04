@@ -17,15 +17,18 @@ int hostname_to_socket(const char *const hostname, t_ping *ping) {
 
   if ((status = getaddrinfo(hostname, NULL, &hints, &res)) != 0 || !res) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
-    return EXIT_FAILURE;
+    return 0;
   }
 
   memcpy(&ping->sock_addr, res->ai_addr, res->ai_addrlen);
   freeaddrinfo(res);
+  return 1;
+}
 
+int create_raw_socket(t_ping *ping) {
   if ((ping->sock_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) == -1) {
     fprintf(stderr, "Couldn't create raw socket, do you have root privileges?\n");
-    return EXIT_FAILURE;
+    return 0;
   }
-  return EXIT_SUCCESS;
+  return 1;
 }

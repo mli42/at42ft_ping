@@ -12,10 +12,16 @@ int main(int argc, char **argv) {
   t_ping ping;
 
   init_ping(&ping);
-  if (parse_args(argc, argv, &ping.flags) != 0)
+  if (!parse_args(argc, argv, &ping.flags))
     return ping.flags.help ? 2 : EXIT_FAILURE;
 
-  hostname_to_socket(argv[argc - 1], &ping);
+  if (
+    !hostname_to_socket(argv[argc - 1], &ping) ||
+    !create_raw_socket(&ping)
+    )
+    return EXIT_FAILURE;
+
+
   ft_ping(&ping);
   return EXIT_SUCCESS;
 }
