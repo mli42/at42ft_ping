@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
   init_ping(&ping);
   if (parse_args(argc, argv, &ping.flags) != 0)
-    return ping.flags.help ? EXIT_SUCCESS : EXIT_FAILURE;
+    return ping.flags.help ? 2 : EXIT_FAILURE;
 
   hostname_to_socket(argv[argc - 1], &ping);
   ft_ping(&ping);
