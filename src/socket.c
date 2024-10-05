@@ -1,10 +1,12 @@
-#include "ft_ping.h"
+#include "socket.h"
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
 
 int dns_lookup(const char *const hostname, t_ping *ping) {
   int status;
@@ -18,7 +20,7 @@ int dns_lookup(const char *const hostname, t_ping *ping) {
   hints.ai_protocol = IPPROTO_ICMP;
 
   if ((status = getaddrinfo(hostname, NULL, &hints, &res)) != 0 || !res) {
-    fprintf(stderr, "ft_ping: %s: %s\n", hostname, gai_strerror(status));
+    fprintf(stderr, "%s: %s: %s\n", ping->program_name, hostname, gai_strerror(status));
     return 0;
   }
 
@@ -28,9 +30,20 @@ int dns_lookup(const char *const hostname, t_ping *ping) {
 }
 
 int create_raw_socket(t_ping *ping) {
+  int on = 1;
+
   if ((ping->sock_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) == -1) {
-    fprintf(stderr, "ft_ping: Couldn't create raw socket, do you have root privileges?\n");
+    fprintf(stderr, "%s: Couldn't create raw socket, do you have root privileges?\n", ping->program_name);
+    return 0;
+  }
+
+  if (setsockopt(ping->sock_fd, IPPROTO_IP, IP_HDRINCL, &on, sizeof(on)) == -1) {
+    fprintf(stderr, "%s: setsockopt: %s\n", ping->program_name, strerror(errno));
     return 0;
   }
   return 1;
+}
+
+const char *ipv4_to_string(struct in_addr *addr, char dest[INET_ADDRSTRLEN]) {
+  return inet_ntop(AF_INET, addr, dest, INET_ADDRSTRLEN);
 }

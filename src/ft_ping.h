@@ -13,8 +13,15 @@ typedef struct s_ping {
   int             sock_fd;
   sockaddr_in_t   sockaddr;
   t_flags         flags;
+
+  const char      *program_name;
+  const char      *hostname;
+  char            ipaddr[INET_ADDRSTRLEN];
 } t_ping;
 
-void ft_ping(t_ping *ping);
+extern t_ping ping;
+
+void ft_ping(int dummy);
+void signal_handler(int dummy);
 
 #endif

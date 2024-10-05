@@ -12,7 +12,7 @@ void print_usage(const char* const prog_name) {
   printf("Options:\n");
   printf("  -v, --verbose    print verbose messages\n");
   printf("  -?, --help       display this help and exit\n");
-  printf("      --ttl=NUM    set time-to-live for the cache\n");
+  printf("      --ttl=NUM    set time-to-live for the cache (<= 255)\n");
 }
 
 int panic(const char* const prog_name, const char* const detail) {
@@ -74,7 +74,7 @@ int parse_args(int argc, char *argv[], t_flags *flags) {
     return panic(
       argv[0],
       optind == argc ?
-      "Missing address or hostname after options" :
+      "missing host operand" :
       "Too many arguments were provided"
     );
   }
