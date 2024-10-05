@@ -33,7 +33,7 @@ int create_raw_socket(t_ping *ping) {
   int on = 1;
 
   if ((ping->sock_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) == -1) {
-    fprintf(stderr, "%s: Couldn't create raw socket, do you have root privileges?\n", ping->program_name);
+    fprintf(stderr, "%s: socket: %s\n", ping->program_name, strerror(errno));
     return 0;
   }
 
