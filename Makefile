@@ -1,7 +1,7 @@
 NAME := ft_ping
 
 CC := gcc
-CFLAGS := -Wall -Wextra -MMD
+CFLAGS := -Wall -Wextra -Werror -MMD
 
 SRCS_PATH := src
 OBJS_PATH := .obj
@@ -12,13 +12,12 @@ SRCS := ${addprefix ${SRCS_PATH}/, ${SRCS_FILES}}
 OBJS := ${addprefix ${OBJS_PATH}/, ${SRCS_FILES:.c=.o}}
 MMD_FILES := ${OBJS:.o=.d}
 
-.PHONY: all
 all: ${NAME}
 
 ${NAME}: ${OBJS}
 	${CC} ${CFLAGS} -o $@ $^
 
-${OBJS_PATH}/%.o: ${SRCS_PATH}/%.c ${OBJS_PATH}
+${OBJS_PATH}/%.o: ${SRCS_PATH}/%.c | ${OBJS_PATH}
 	${CC} ${CFLAGS} -o $@ -c $<
 
 ${OBJS_PATH}:
