@@ -7,6 +7,15 @@
 
 t_ping ping;
 
+void print_ping_header(const t_ping ping) {
+  printf("PING %s (%s): %lu data bytes", ping.hostname, ping.ipaddr, PAYLOAD_SIZE);
+
+  if (ping.flags.verbose)
+    printf(", id 0x%1$x = %1$d", getpid());
+
+  printf("\n");
+}
+
 void init_ping(t_ping *ping) {
   memset(ping, 0, sizeof(t_ping));
   ping->flags.ttl = 64;
@@ -32,6 +41,7 @@ int main(int argc, char **argv) {
   signal(SIGQUIT, signal_handler);
   signal(SIGALRM, ft_ping);
 
+  print_ping_header(ping);
   alarm(1);
 
   while (1) {
