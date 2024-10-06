@@ -8,7 +8,7 @@
 t_ping ping;
 
 void print_ping_header(const t_ping ping) {
-  printf("PING %s (%s): %lu data bytes", ping.hostname, ping.ipaddr, PAYLOAD_SIZE);
+  printf("PING %s (%s): %lu data bytes", ping.hostname, ping.ipaddr, PACKET_PAYLOAD_SIZE);
 
   if (ping.flags.verbose)
     printf(", id 0x%1$x = %1$d", getpid());
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
   signal(SIGALRM, ft_ping);
 
   print_ping_header(ping);
-  alarm(1);
+  ft_ping(0);
 
   while (1) {
     pause();

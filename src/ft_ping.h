@@ -7,9 +7,12 @@
 # include <sys/types.h>
 # include <netdb.h>
 # include <netinet/ip_icmp.h>
+# include <sys/time.h>
+# include <errno.h>
 
 # define PACKET_SIZE 64
-# define PAYLOAD_SIZE (PACKET_SIZE - sizeof(struct icmphdr))
+# define PACKET_PAYLOAD_SIZE (PACKET_SIZE - sizeof(struct icmphdr))
+# define PACKET_DATA_SIZE (PACKET_PAYLOAD_SIZE - sizeof(struct timeval))
 
 typedef struct sockaddr sockaddr_t;
 typedef struct sockaddr_in sockaddr_in_t;
@@ -24,9 +27,14 @@ typedef struct s_ping {
   char            ipaddr[INET_ADDRSTRLEN];
 } t_ping;
 
+typedef struct s_icmp_packet_payload {
+  struct timeval  timeval;
+  char            data[PACKET_DATA_SIZE];
+} t_icmp_packet_payload;
+
 typedef struct s_icmp_packet {
-  struct icmphdr  icmphdr;
-  char            payload[PAYLOAD_SIZE];
+  struct icmphdr        icmphdr;
+  t_icmp_packet_payload payload;
 } t_icmp_packet;
 
 extern t_ping ping;
