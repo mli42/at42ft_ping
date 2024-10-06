@@ -54,7 +54,7 @@ vm.reload:
 	vagrant reload
 
 .PHONY: vm.ssh
-vm.ssh:
+vm.ssh: vm.up
 	vagrant ssh
 
 .PHONY: vm.clean
