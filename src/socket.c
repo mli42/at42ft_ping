@@ -31,6 +31,7 @@ int dns_lookup(const char *const hostname, t_ping *ping) {
 
 int create_raw_socket(t_ping *ping) {
   int on = 1;
+  int ttl_val = ping->flags.ttl;
 
   if ((ping->sock_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) == -1) {
     fprintf(stderr, "%s: socket: %s\n", ping->program_name, strerror(errno));
@@ -41,6 +42,12 @@ int create_raw_socket(t_ping *ping) {
     fprintf(stderr, "%s: setsockopt: %s\n", ping->program_name, strerror(errno));
     return 0;
   }
+
+  if (setsockopt(ping->sock_fd, IPPROTO_IP, IP_TTL, &ttl_val, sizeof(ttl_val)) == -1) {
+    fprintf(stderr, "%s: setsockopt: %s\n", ping->program_name, strerror(errno));
+    return 0;
+  }
+
   return 1;
 }
 
