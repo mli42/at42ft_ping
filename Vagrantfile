@@ -7,9 +7,24 @@ SERVER_SCRIPT = <<-SHELL
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
     xauth \
     wireshark \
-    make gcc vim \
-    inetutils-ping
+    make gcc vim
   sudo usermod -aG wireshark vagrant
+
+  # Install inetutils-2.0
+  wget https://ftp.gnu.org/gnu/inetutils/inetutils-2.0.tar.gz
+  tar -xzvf inetutils-2.0.tar.gz
+  cd inetutils-2.0
+  ./configure --prefix=/usr      \
+            --localstatedir=/var \
+            --disable-logger     \
+            --disable-whois      \
+            --disable-rcp        \
+            --disable-rexec      \
+            --disable-rlogin     \
+            --disable-rsh        \
+            --disable-servers
+  sudo make
+  sudo make install
 
   echo "cd /vagrant" >> /home/vagrant/.bashrc
   SHELL
