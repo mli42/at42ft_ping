@@ -17,6 +17,10 @@
 typedef struct sockaddr sockaddr_t;
 typedef struct sockaddr_in sockaddr_in_t;
 
+typedef struct s_ping_stats {
+  unsigned long int sent;
+} t_ping_stats;
+
 typedef struct s_ping {
   int             sock_fd;
   sockaddr_in_t   sockaddr;
@@ -25,6 +29,8 @@ typedef struct s_ping {
   const char      *program_name;
   const char      *hostname;
   char            ipaddr[INET_ADDRSTRLEN];
+
+  t_ping_stats    stats;
 } t_ping;
 
 typedef struct s_icmp_packet_payload {
