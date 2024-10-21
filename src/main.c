@@ -1,5 +1,6 @@
 #include "ft_ping.h"
 #include "socket.h"
+#include "recv_ping.h"
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
@@ -45,6 +46,7 @@ int main(int argc, char **argv) {
   ft_ping(0);
 
   while (1) {
+    recv_ping(&ping);
     pause();
   }
 

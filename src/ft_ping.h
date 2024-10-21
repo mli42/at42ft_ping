@@ -11,6 +11,7 @@
 # include <errno.h>
 
 # define PACKET_SIZE 64
+# define REPLY_PACKET_SIZE (PACKET_SIZE + sizeof(struct iphdr))
 # define PACKET_PAYLOAD_SIZE (PACKET_SIZE - sizeof(struct icmphdr))
 # define PACKET_DATA_SIZE (PACKET_PAYLOAD_SIZE - sizeof(struct timeval))
 
@@ -47,5 +48,6 @@ extern t_ping ping;
 
 void ft_ping(int dummy);
 void signal_handler(int dummy);
+uint16_t checksum(void *data, size_t size);
 
 #endif
