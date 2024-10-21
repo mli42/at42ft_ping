@@ -49,8 +49,20 @@ void recv_ping(const t_ping *const ping) {
     return ;
   }
 
-  if (!is_valid_checksum(packet) || packet->icmphdr.type != ICMP_ECHOREPLY) {
-    fprintf(stderr, "%s: Unexpected packet\n", ping->program_name);
+  if (!is_valid_checksum(packet)) {
+    fprintf(stderr, "%s: Invalid packet\n", ping->program_name);
     return ;
+  }
+
+  switch (packet->icmphdr.type) {
+
+  case ICMP_ECHO:
+    break;
+  case ICMP_ECHOREPLY:
+    break;
+
+  default:
+    fprintf(stderr, "%s: Unexpected packet\n", ping->program_name);
+    break;
   }
 }
