@@ -65,6 +65,5 @@ void ft_ping(__attribute__((unused)) int dummy) {
   if (sendto(ping.sock_fd, &packet, sizeof(packet), 0, (sockaddr_t *)&ping.sockaddr, sizeof(ping.sockaddr)) == -1) {
     fprintf(stderr, "%s: sendto: %s\n", ping.program_name, strerror(errno));
   }
-  printf("COUCOU %lu\n", ping.stats.sent);
   alarm(1);
 }
