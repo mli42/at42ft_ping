@@ -50,7 +50,6 @@ extern t_ping ping;
 
 void ft_ping(int dummy);
 void signal_handler(int dummy);
-uint16_t checksum(void *data, size_t size);
 
 void recv_ping(t_ping *const ping);
 

@@ -1,4 +1,5 @@
 #include "ft_ping.h"
+#include "utils/icmp.h"
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -21,22 +22,6 @@ void signal_handler(int signum) {
   default:
     return ;
   }
-}
-
-uint16_t checksum(void *data, size_t size) {
-  uint16_t *ptr = data;
-  uint32_t sum = 0;
-
-  while (size > 1) {
-    sum += *ptr++;
-    size -= 2;
-  }
-  if (size > 0) {
-    sum += *(uint8_t *)ptr;
-  }
-  while (sum >> 16)
-    sum = (sum & 0xffff) + (sum >> 16);
-  return ~sum;
 }
 
 void fill_payload(t_icmp_packet_payload *payload) {
