@@ -17,12 +17,14 @@ uint16_t checksum(void *data, size_t size) {
   return ~sum;
 }
 
-int is_valid_checksum(const t_icmp_packet *const packet) {
-  t_icmp_packet packet_copy;
+int is_valid_checksum(t_icmp_packet *const packet, size_t size) {
+  const uint16_t checksum_copy = packet->icmphdr.checksum;
+  uint16_t new_checksum;
 
-  memcpy(&packet_copy, packet, sizeof(packet_copy));
-  packet_copy.icmphdr.checksum = 0;
-  return packet->icmphdr.checksum == checksum(&packet_copy, sizeof(packet_copy));
+  packet->icmphdr.checksum = 0;
+  new_checksum = checksum(packet, size);
+  packet->icmphdr.checksum = checksum_copy;
+  return new_checksum == checksum_copy;
 }
 
 const char *get_error_message(const t_icmp_packet *const packet) {

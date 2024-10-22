@@ -88,7 +88,7 @@ void recv_ping(t_ping *const ping) {
   struct iovec iov;
   sockaddr_in_t addr;
   unsigned char reply[READ_REPLY_SIZE];
-  const t_icmp_packet *const packet = (t_icmp_packet *)&reply[sizeof(struct iphdr)];
+  t_icmp_packet *const packet = (t_icmp_packet *)&reply[sizeof(struct iphdr)];
 
   memcpy(&addr, &ping->sockaddr, sizeof(addr));
   init_payload(&msghdr, &cmsg, &iov, &addr, reply);
@@ -98,7 +98,7 @@ void recv_ping(t_ping *const ping) {
     return ;
   }
 
-  if (!is_valid_checksum(packet)) {
+  if (!is_valid_checksum(packet, readlen - sizeof(struct iphdr))) {
     handle_unexpected_packet(ping, &addr, packet, readlen);
     return ;
   }
