@@ -5,8 +5,10 @@ CFLAGS := -Wall -Wextra -Werror -MMD
 
 SRCS_PATH := src
 OBJS_PATH := .obj
+OBJS_SUBPATHS := ${addprefix ${OBJS_PATH}/, utils}
 
-SRCS_FILES := main.c parse_args.c socket.c ping.c recv_ping.c
+SRCS_FILES := main.c parse_args.c socket.c ping.c recv_ping.c \
+	${addprefix utils/, icmp.c}
 
 SRCS := ${addprefix ${SRCS_PATH}/, ${SRCS_FILES}}
 OBJS := ${addprefix ${OBJS_PATH}/, ${SRCS_FILES:.c=.o}}
@@ -17,10 +19,10 @@ all: ${NAME}
 ${NAME}: ${OBJS}
 	${CC} ${CFLAGS} -o $@ $^
 
-${OBJS_PATH}/%.o: ${SRCS_PATH}/%.c | ${OBJS_PATH}
+${OBJS_PATH}/%.o: ${SRCS_PATH}/%.c | ${OBJS_PATH} ${OBJS_SUBPATHS}
 	${CC} ${CFLAGS} -o $@ -c $<
 
-${OBJS_PATH}:
+${OBJS_PATH} ${OBJS_SUBPATHS}:
 	mkdir -p $@
 
 .PHONY: clean

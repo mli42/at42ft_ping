@@ -1,32 +1,78 @@
-#include "recv_ping.h"
+#include "ft_ping.h"
+#include "socket.h"
+#include "utils/icmp.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-int is_valid_checksum(const t_icmp_packet *const packet) {
-  t_icmp_packet packet_copy;
+void handle_unexpected_packet(
+  const t_ping *const ping,
+  const sockaddr_in_t *const addr,
+  const t_icmp_packet *const packet,
+  int readlen
+) {
+  char hostname[INET_ADDRSTRLEN] = { 0 };
+  char iphdr_dump[IPHDR_DUMP_LEN] = { 0 };
+  const char *const error_message = get_error_message(packet);
+  const struct iphdr *const sent_iphdr = (struct iphdr *)&packet->payload;
+  const t_icmp_packet *const sent_packet = (t_icmp_packet *)((unsigned char *)&packet->payload + sizeof(struct iphdr));
 
-  memcpy(&packet_copy, packet, sizeof(packet_copy));
-  packet_copy.icmphdr.checksum = 0;
-  return packet->icmphdr.checksum == checksum(&packet_copy, sizeof(packet_copy));
+  ipv4_to_string(&addr->sin_addr, hostname);
+
+  printf("%lu bytes from %s: %s\n", readlen - sizeof(struct iphdr), hostname, error_message);
+
+  if (ping->flags.verbose) {
+    printf("IP Hdr Dump:\n %s\n", get_iphdr_dump(sent_iphdr, iphdr_dump));
+
+    printf("Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src\tDst\tData\n" \
+      "%2x %2x  %02x %04x %4x %3x %04x  %02x  %02x %4x %d.%d.%d.%d  %d.%d.%d.%d\n",
+      sent_iphdr->version,
+      sent_iphdr->ihl,
+      sent_iphdr->tos,
+      *((uint8_t *)&sent_iphdr->tot_len + 1),
+      sent_iphdr->id,
+      ((uint8_t)sent_iphdr->frag_off & 0b11100000) >> 5,
+      *((uint8_t *)&sent_iphdr->frag_off + 1),
+      sent_iphdr->ttl,
+      sent_iphdr->protocol,
+      sent_iphdr->check,
+      *((uint8_t *)&sent_iphdr->saddr + 0),
+      *((uint8_t *)&sent_iphdr->saddr + 1),
+      *((uint8_t *)&sent_iphdr->saddr + 2),
+      *((uint8_t *)&sent_iphdr->saddr + 3),
+      *((uint8_t *)&sent_iphdr->daddr + 0),
+      *((uint8_t *)&sent_iphdr->daddr + 1),
+      *((uint8_t *)&sent_iphdr->daddr + 2),
+      *((uint8_t *)&sent_iphdr->daddr + 3)
+    );
+
+    printf("ICMP: type %d, code %d, size %d, id 0x%x, seq 0x%04x\n",
+      sent_packet->icmphdr.type,
+      sent_packet->icmphdr.code,
+      PACKET_SIZE,
+      sent_packet->icmphdr.un.echo.id,
+      sent_packet->icmphdr.un.echo.sequence
+    );
+  }
 }
 
 void init_payload(
   struct msghdr *msghdr,
   struct cmsghdr *cmsg,
   struct iovec *iov,
-  unsigned char reply[REPLY_PACKET_SIZE]
+  sockaddr_in_t *addr,
+  unsigned char reply[READ_REPLY_SIZE]
 ) {
   memset(msghdr, 0, sizeof(*msghdr));
   memset(cmsg, 0, sizeof(*cmsg));
   memset(iov, 0, sizeof(*iov));
-  memset(reply, 0, REPLY_PACKET_SIZE);
+  memset(reply, 0, READ_REPLY_SIZE);
 
   iov->iov_base = reply;
-  iov->iov_len = REPLY_PACKET_SIZE;
+  iov->iov_len = READ_REPLY_SIZE;
 
-  msghdr->msg_name = &ping.sockaddr;
-  msghdr->msg_namelen = sizeof(ping.sockaddr);
+  msghdr->msg_name = addr;
+  msghdr->msg_namelen = sizeof(*addr);
 
   msghdr->msg_iov = iov;
   msghdr->msg_iovlen = 1;
@@ -35,34 +81,36 @@ void init_payload(
   msghdr->msg_controllen = sizeof(*cmsg);
 }
 
-void recv_ping(const t_ping *const ping) {
+void recv_ping(t_ping *const ping) {
+  int readlen;
   struct msghdr msghdr;
   struct cmsghdr cmsg;
   struct iovec iov;
-  unsigned char reply[REPLY_PACKET_SIZE];
+  sockaddr_in_t addr;
+  unsigned char reply[READ_REPLY_SIZE];
   const t_icmp_packet *const packet = (t_icmp_packet *)&reply[sizeof(struct iphdr)];
 
-  init_payload(&msghdr, &cmsg, &iov, reply);
+  memcpy(&addr, &ping->sockaddr, sizeof(addr));
+  init_payload(&msghdr, &cmsg, &iov, &addr, reply);
 
-  if (recvmsg(ping->sock_fd, &msghdr, 0) < 0) {
+  if ((readlen = recvmsg(ping->sock_fd, &msghdr, 0)) < 0) {
     fprintf(stderr, "%s: recvmsg: %s\n", ping->program_name, strerror(errno));
     return ;
   }
 
   if (!is_valid_checksum(packet)) {
-    fprintf(stderr, "%s: Invalid packet\n", ping->program_name);
+    handle_unexpected_packet(ping, &addr, packet, readlen);
     return ;
   }
 
   switch (packet->icmphdr.type) {
-
   case ICMP_ECHO:
     break;
   case ICMP_ECHOREPLY:
+    ping->stats.received++;
     break;
-
   default:
-    fprintf(stderr, "%s: Unexpected packet\n", ping->program_name);
+    handle_unexpected_packet(ping, &addr, packet, readlen);
     break;
   }
 }

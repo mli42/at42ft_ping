@@ -5,6 +5,8 @@
 #include <string.h>
 
 void signal_handler(int signum) {
+  const double loss_percentage = (1 - (double)ping.stats.received / ping.stats.sent) * 100;
+
   switch (signum) {
   case SIGQUIT:
     printf("Quit\n");
@@ -13,6 +15,8 @@ void signal_handler(int signum) {
   case SIGINT:
     printf("--- %s ping statistics ---\n", ping.hostname);
     close(ping.sock_fd);
+
+    printf("%lu packets transmitted, %lu packets received, %.4g%% packet loss\n", ping.stats.sent, ping.stats.received, loss_percentage);
     exit(0);
   default:
     return ;
@@ -53,7 +57,7 @@ void fill_icmp_packet(t_icmp_packet *packet) {
   fill_payload(&packet->payload);
   packet->icmphdr.type = ICMP_ECHO;
   packet->icmphdr.un.echo.id = getpid();
-  packet->icmphdr.un.echo.sequence = ++ping.stats.sent;
+  packet->icmphdr.un.echo.sequence = ping.stats.sent++;
   packet->icmphdr.checksum = checksum(packet, sizeof(*packet));
 }
 

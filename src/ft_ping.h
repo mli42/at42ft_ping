@@ -12,6 +12,7 @@
 
 # define PACKET_SIZE 64
 # define REPLY_PACKET_SIZE (PACKET_SIZE + sizeof(struct iphdr))
+# define READ_REPLY_SIZE (REPLY_PACKET_SIZE * 2)
 # define PACKET_PAYLOAD_SIZE (PACKET_SIZE - sizeof(struct icmphdr))
 # define PACKET_DATA_SIZE (PACKET_PAYLOAD_SIZE - sizeof(struct timeval))
 
@@ -20,6 +21,7 @@ typedef struct sockaddr_in sockaddr_in_t;
 
 typedef struct s_ping_stats {
   unsigned long int sent;
+  unsigned long int received;
 } t_ping_stats;
 
 typedef struct s_ping {
@@ -49,5 +51,7 @@ extern t_ping ping;
 void ft_ping(int dummy);
 void signal_handler(int dummy);
 uint16_t checksum(void *data, size_t size);
+
+void recv_ping(t_ping *const ping);
 
 #endif

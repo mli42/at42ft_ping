@@ -1,6 +1,5 @@
 #include "ft_ping.h"
 #include "socket.h"
-#include "recv_ping.h"
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>

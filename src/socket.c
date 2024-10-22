@@ -44,6 +44,6 @@ int create_raw_socket(t_ping *ping) {
   return 1;
 }
 
-const char *ipv4_to_string(struct in_addr *addr, char dest[INET_ADDRSTRLEN]) {
+const char *ipv4_to_string(const struct in_addr *addr, char dest[INET_ADDRSTRLEN]) {
   return inet_ntop(AF_INET, addr, dest, INET_ADDRSTRLEN);
 }
