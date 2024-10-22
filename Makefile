@@ -5,10 +5,11 @@ CFLAGS := -Wall -Wextra -Werror -MMD
 
 SRCS_PATH := src
 OBJS_PATH := .obj
-OBJS_SUBPATHS := ${addprefix ${OBJS_PATH}/, utils}
+OBJS_SUBPATHS := ${addprefix ${OBJS_PATH}/, utils parsing}
 
-SRCS_FILES := main.c parse_args.c socket.c ping.c recv_ping.c \
-	${addprefix utils/, icmp.c}
+SRCS_FILES := main.c socket.c ping.c recv_ping.c \
+	${addprefix utils/, icmp.c} \
+	${addprefix parsing/, parse_args.c}
 
 SRCS := ${addprefix ${SRCS_PATH}/, ${SRCS_FILES}}
 OBJS := ${addprefix ${OBJS_PATH}/, ${SRCS_FILES:.c=.o}}
