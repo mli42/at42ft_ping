@@ -5,8 +5,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+// https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method
+// https://en.wikipedia.org/wiki/Newton%27s_method#Use_of_Newton's_method_to_compute_square_roots
+double ft_sqrt(double x) {
+  double y = x / 2.;
+
+  for (int i = 0; i < 10; i++)
+    y = (y + x / y) / 2.;
+  return y;
+}
+
 void signal_handler(int signum) {
   const double loss_percentage = (1 - (double)ping.stats.received / ping.stats.sent) * 100;
+  const double stddev = ping.stats.received > 2 ? ft_sqrt(ping.stats.m2 / ping.stats.received) : 0;
 
   switch (signum) {
   case SIGQUIT:
@@ -18,7 +29,10 @@ void signal_handler(int signum) {
     close(ping.sock_fd);
 
     printf("%lu packets transmitted, %lu packets received, %.4g%% packet loss\n", ping.stats.sent, ping.stats.received, loss_percentage);
-    printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", ping.stats.min_rtt, ping.stats.total_rtt / ping.stats.received, ping.stats.max_rtt, ping.stats.max_rtt);
+
+    if (ping.stats.received) {
+      printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", ping.stats.min_rtt, ping.stats.mean, ping.stats.max_rtt, stddev);
+    }
     exit(0);
   default:
     return ;

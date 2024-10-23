@@ -56,6 +56,23 @@ void handle_unexpected_packet(
   }
 }
 
+// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+void update_welford_stats(t_ping *ping, float time_ms) {
+  float delta1, delta2;
+
+  ping->stats.received++;
+
+  if (time_ms < ping->stats.min_rtt || ping->stats.min_rtt == 0.)
+    ping->stats.min_rtt = time_ms;
+  if (time_ms > ping->stats.max_rtt)
+    ping->stats.max_rtt = time_ms;
+
+  delta1 = time_ms - ping->stats.mean;
+  ping->stats.mean += delta1 / ping->stats.received;
+  delta2 = time_ms - ping->stats.mean;
+  ping->stats.m2 += delta1 * delta2;
+}
+
 void handle_echo_reply_packet(
   t_ping *const ping,
   const sockaddr_in_t *const addr,
@@ -72,12 +89,7 @@ void handle_echo_reply_packet(
   }
   timersub(&received_time, (struct timeval *)&packet->payload, &time_diff);
   time_ms = time_diff.tv_sec * 1000. + time_diff.tv_usec / 1000.;
-
-  if (time_ms < ping->stats.min_rtt || ping->stats.min_rtt == 0.)
-    ping->stats.min_rtt = time_ms;
-  if (time_ms > ping->stats.max_rtt)
-    ping->stats.max_rtt = time_ms;
-  ping->stats.total_rtt += time_ms;
+  update_welford_stats(ping, time_ms);
 
   printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n",
     readlen,
@@ -141,7 +153,6 @@ void recv_ping(t_ping *const ping) {
     break;
   case ICMP_ECHOREPLY:
     handle_echo_reply_packet(ping, &addr, iphdr, packet, readlen);
-    ping->stats.received++;
     break;
   default:
     handle_unexpected_packet(ping, &addr, packet, readlen);

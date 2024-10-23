@@ -24,7 +24,8 @@ typedef struct s_ping_stats {
   unsigned long int received;
   float min_rtt;
   float max_rtt;
-  float total_rtt;
+  float mean;
+  float m2;
 } t_ping_stats;
 
 typedef struct s_ping {
