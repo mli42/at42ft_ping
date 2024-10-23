@@ -18,6 +18,7 @@ void signal_handler(int signum) {
     close(ping.sock_fd);
 
     printf("%lu packets transmitted, %lu packets received, %.4g%% packet loss\n", ping.stats.sent, ping.stats.received, loss_percentage);
+    printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", ping.stats.min_rtt, ping.stats.total_rtt / ping.stats.received, ping.stats.max_rtt, ping.stats.max_rtt);
     exit(0);
   default:
     return ;

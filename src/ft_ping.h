@@ -22,6 +22,9 @@ typedef struct sockaddr_in sockaddr_in_t;
 typedef struct s_ping_stats {
   unsigned long int sent;
   unsigned long int received;
+  float min_rtt;
+  float max_rtt;
+  float total_rtt;
 } t_ping_stats;
 
 typedef struct s_ping {

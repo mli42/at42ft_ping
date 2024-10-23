@@ -19,7 +19,7 @@ void handle_unexpected_packet(
 
   ipv4_to_string(&addr->sin_addr, hostname);
 
-  printf("%lu bytes from %s: %s\n", readlen - sizeof(struct iphdr), hostname, error_message);
+  printf("%d bytes from %s: %s\n", readlen, hostname, error_message);
 
   if (ping->flags.verbose) {
     printf("IP Hdr Dump:\n %s\n", get_iphdr_dump(sent_iphdr, iphdr_dump));
@@ -56,6 +56,37 @@ void handle_unexpected_packet(
   }
 }
 
+void handle_echo_reply_packet(
+  t_ping *const ping,
+  const sockaddr_in_t *const addr,
+  const struct iphdr *const iphdr,
+  const t_icmp_packet *const packet,
+  int readlen
+) {
+  struct timeval received_time;
+  struct timeval time_diff;
+  float time_ms;
+
+  if (gettimeofday(&received_time, NULL) == -1) {
+    fprintf(stderr, "%s: %s\n", ping->program_name, strerror(errno));
+  }
+  timersub(&received_time, (struct timeval *)&packet->payload, &time_diff);
+  time_ms = time_diff.tv_sec * 1000. + time_diff.tv_usec / 1000.;
+
+  if (time_ms < ping->stats.min_rtt || ping->stats.min_rtt == 0.)
+    ping->stats.min_rtt = time_ms;
+  if (time_ms > ping->stats.max_rtt)
+    ping->stats.max_rtt = time_ms;
+  ping->stats.total_rtt += time_ms;
+
+  printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n",
+    readlen,
+    ping->ipaddr,
+    packet->icmphdr.un.echo.sequence, iphdr->ttl,
+    time_ms
+  );
+}
+
 void init_payload(
   struct msghdr *msghdr,
   struct cmsghdr *cmsg,
@@ -88,6 +119,7 @@ void recv_ping(t_ping *const ping) {
   struct iovec iov;
   sockaddr_in_t addr;
   unsigned char reply[READ_REPLY_SIZE];
+  const struct iphdr *const iphdr = (struct iphdr *)reply;
   t_icmp_packet *const packet = (t_icmp_packet *)&reply[sizeof(struct iphdr)];
 
   memcpy(&addr, &ping->sockaddr, sizeof(addr));
@@ -98,7 +130,8 @@ void recv_ping(t_ping *const ping) {
     return ;
   }
 
-  if (!is_valid_checksum(packet, readlen - sizeof(struct iphdr))) {
+  readlen -= sizeof(struct iphdr);
+  if (!is_valid_checksum(packet, readlen)) {
     handle_unexpected_packet(ping, &addr, packet, readlen);
     return ;
   }
@@ -107,6 +140,7 @@ void recv_ping(t_ping *const ping) {
   case ICMP_ECHO:
     break;
   case ICMP_ECHOREPLY:
+    handle_echo_reply_packet(ping, &addr, iphdr, packet, readlen);
     ping->stats.received++;
     break;
   default:
