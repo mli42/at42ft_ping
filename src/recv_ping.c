@@ -75,7 +75,6 @@ void update_welford_stats(t_ping *ping, float time_ms) {
 
 void handle_echo_reply_packet(
   t_ping *const ping,
-  const sockaddr_in_t *const addr,
   const struct iphdr *const iphdr,
   const t_icmp_packet *const packet,
   int readlen
@@ -94,7 +93,8 @@ void handle_echo_reply_packet(
   printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n",
     readlen,
     ping->ipaddr,
-    packet->icmphdr.un.echo.sequence, iphdr->ttl,
+    packet->icmphdr.un.echo.sequence,
+    iphdr->ttl,
     time_ms
   );
 }
@@ -152,7 +152,7 @@ void recv_ping(t_ping *const ping) {
   case ICMP_ECHO:
     break;
   case ICMP_ECHOREPLY:
-    handle_echo_reply_packet(ping, &addr, iphdr, packet, readlen);
+    handle_echo_reply_packet(ping, iphdr, packet, readlen);
     break;
   default:
     handle_unexpected_packet(ping, &addr, packet, readlen);
