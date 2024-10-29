@@ -46,7 +46,6 @@ int main(int argc, char **argv) {
 
   while (1) {
     recv_ping(&ping);
-    pause();
   }
 
   return EXIT_SUCCESS;
