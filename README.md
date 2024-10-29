@@ -18,7 +18,7 @@ make vm.ssh
 wireshark
 ```
 
-You can log in as `vagrant:vagrant`
+You can log in as `root:vagrant`
 
 ### ft_ping
 
