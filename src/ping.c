@@ -17,7 +17,7 @@ double ft_sqrt(double x) {
 
 void signal_handler(int signum) {
   const double loss_percentage = ping.stats.sent > 0 ? (1 - (double)ping.stats.received / ping.stats.sent) * 100 : 0;
-  const double stddev = ping.stats.received > 2 ? ft_sqrt(ping.stats.m2 / ping.stats.received) : 0;
+  const double stddev = ping.stats.received > 1 ? ft_sqrt(ping.stats.m2 / ping.stats.received) : 0;
 
   switch (signum) {
   case SIGQUIT:
